@@ -29,8 +29,8 @@ fun dumpHit(page: Int) {
 }
 
 fun dumpReplace(oldPage: Int?, newPage: Int) {
-    val message = if (oldPage == null) "Page $newPage was inserted. "
-        else "Page $oldPage was replaced with Page $newPage. "
+    val message = if (oldPage == null) "Page $newPage was inserted"
+        else "Page $oldPage was replaced with Page $newPage"
     println("$message. ${Colors.RED}+1 fault${Colors.RESET}")
 }
 

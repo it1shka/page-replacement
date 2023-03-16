@@ -3,6 +3,15 @@ abstract class Algorithm(memorySize: Int) {
     protected abstract val name: String
 
     protected abstract fun replace(page: Int)
+
+    protected fun replaceWith(oldPage: Int?, newPage: Int): Boolean {
+        val index = memory.indexOf(oldPage)
+        if (index == -1) return false
+        memory[index] = newPage
+        dumpReplace(oldPage, newPage)
+        return true
+    }
+
     fun run(referenceString: List<Int>) {
         dumpHeader("$name: ")
         var (hits, faults) = listOf(0, 0)
@@ -12,6 +21,7 @@ abstract class Algorithm(memorySize: Int) {
                 dumpHit(page)
             } else {
                 replace(page)
+                faults++
                 dumpMemory(memory)
             }
         }

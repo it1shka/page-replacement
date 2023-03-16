@@ -4,9 +4,7 @@ class FirstInFirstOut(memorySize: Int): Algorithm(memorySize) {
 
     override fun replace(page: Int) {
         replaceIndex %= memory.size
-        val old = memory[replaceIndex]
-        memory[replaceIndex] = page
-        replaceIndex++
-        dumpReplace(old, page)
+        val old = memory[replaceIndex++]
+        replaceWith(old, page)
     }
 }

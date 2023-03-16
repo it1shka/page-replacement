@@ -43,11 +43,13 @@ fun getPageReferenceString(): List<Int> {
 fun main() {
     val slotsAmount = getPositiveInteger("Please, enter slots amount: ")
     val referenceString = getPageReferenceString()
-    // here i will be running algorithms
+    // here I will be running algorithms
     val algorithms = arrayOf(
         FirstInFirstOut(slotsAmount),
+        Optimal(slotsAmount),
     )
     for (algorithm in algorithms) {
+        println()
         algorithm.run(referenceString)
     }
 }
