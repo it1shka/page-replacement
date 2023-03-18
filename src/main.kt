@@ -1,3 +1,6 @@
+import kotlin.math.max
+import kotlin.random.Random
+
 fun getPositiveInteger(prompt: String?): Int {
     print(prompt ?: "Please, enter an integer: ")
     while (true) {
@@ -15,10 +18,40 @@ fun getPositiveInteger(prompt: String?): Int {
     }
 }
 
+fun generateRandomReferenceString(size: Int): List<Int> {
+    var current = 0
+    return List(size + 1) {
+        current += when (Random.nextInt(3)) {
+            1 -> 1
+            2 -> -1
+            else -> 0
+        }
+        current = max(current, 1)
+        current
+    }
+}
+
+fun generateFullyRandomReferenceString(size: Int): List<Int> =
+    List(size) { Random.nextInt(10) }
+
 fun getPageReferenceString(): List<Int> {
     println("Please, enter page reference string: ")
     outer@ while (true) {
-        val input = readln()
+        val input = readln().trim()
+        if (input.startsWith('~') || input.startsWith('@')) {
+            val size = input.slice(1 until input.length).toIntOrNull()
+            if (size == null) {
+                println("\"$input\" does not contain an integer. Please, try again: ")
+                continue@outer
+            }
+            val random = when(input[0]) {
+                '~' -> generateRandomReferenceString(size)
+                else -> generateFullyRandomReferenceString(size)
+            }
+            println("Reference string: ")
+            println("${Colors.GREEN}${random.joinToString()}${Colors.RESET}")
+            return random
+        }
         val parts = input
             .split(',')
             .map { it.trim() }
@@ -40,6 +73,14 @@ fun getPageReferenceString(): List<Int> {
     }
 }
 
+fun printAlgorithmStats(algorithms: Array<Algorithm>) {
+    println()
+    algorithms.forEach {
+        val efficiency = "%.2f".format(it.success * 100) + "%"
+        println("${Colors.BLUE}${it.name}:${Colors.RESET} $efficiency")
+    }
+}
+
 fun main() {
     val slotsAmount = getPositiveInteger("Please, enter slots amount: ")
     val referenceString = getPageReferenceString()
@@ -47,9 +88,11 @@ fun main() {
     val algorithms = arrayOf(
         FirstInFirstOut(slotsAmount),
         Optimal(slotsAmount),
+        LeastRecentlyUsed(slotsAmount)
     )
-    for (algorithm in algorithms) {
+    algorithms.forEach {
         println()
-        algorithm.run(referenceString)
+        it.run(referenceString)
     }
+    printAlgorithmStats(algorithms)
 }

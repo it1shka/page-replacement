@@ -15,9 +15,9 @@ object Colors {
 // functions for console logging
 
 fun dumpStats(hits: Int, faults: Int) {
-    val hitsString = "${Colors.GREEN}Hits: $hits${Colors.RESET}"
-    val faultsString = "${Colors.RED}Faults: $faults${Colors.RESET}"
-    println("$hitsString, $faultsString")
+    val hitsString = "Hits: $hits"
+    val faultsString = "Faults: $faults"
+    println("${Colors.YELLOW}$hitsString, $faultsString${Colors.RESET}")
 }
 
 fun dumpHeader(algorithm: String) {
