@@ -1,32 +1,50 @@
-abstract class Algorithm(memorySize: Int) {
-    abstract val name: String
-    protected val memory = Array<Int?>(memorySize) { null }
+abstract class Algorithm(protected val memory: Memory) {
+
+    // private fields
+    protected abstract val name: String
     private var hits = 0
-    private  var faults = 0
-    val success get() = hits.toFloat() / (hits + faults).toFloat()
+    private var faults = 0
+    private val efficiencyRate get() = hits.toFloat() / (hits + faults).toFloat()
 
-    protected abstract fun replace(page: Int)
+    // for logging
+    val header get() = "${Colors.YELLOW}$name: ${Colors.RESET}"
+    val statistics get(): String {
+        val hitsString = "Hits: $hits"
+        val faultsString = "Faults: $faults"
+        return "${Colors.YELLOW}$hitsString, $faultsString${Colors.RESET}"
+    }
+    val efficiency get() = "%.2f".format(efficiencyRate)
 
-    protected fun replaceWith(oldPage: Int?, newPage: Int): Boolean {
-        val index = memory.indexOf(oldPage)
-        if (index == -1) return false
-        memory[index] = newPage
-        dumpReplace(oldPage, newPage)
-        return true
+    // for dumping to output
+    private val buffer = StringBuilder()
+    val output get() = buffer.toString()
+
+    private fun dumpReplace(oldPage: Int?, newPage: Int) {
+        val message = if (oldPage == null) "Page $newPage was inserted"
+        else "Page $oldPage was replaced with Page $newPage"
+        buffer.append("$message. ${Colors.RED}+1 fault${Colors.RESET}\n")
     }
 
-    fun run(referenceString: List<Int>) {
-        dumpHeader("$name: ")
-        for (page in referenceString) {
-            if (memory.contains(page)) {
-                hits++
-                dumpHit(page)
-            } else {
-                replace(page)
-                faults++
-                dumpMemory(memory)
-            }
+    private fun dumpHit(page: Int) {
+        val message = "Page $page was hit! ${Colors.GREEN}+1 hit${Colors.RESET}"
+        buffer.append("$message\n")
+    }
+
+    private fun dumpMemory() = buffer.append("${memory.getDump()}\n")
+
+    // core functionality
+    open fun processPage(page: Int) {
+        if (memory.contains(page)) {
+            dumpHit(page)
+            hits++
+        } else {
+            val old = replace(page)
+            dumpReplace(old, page)
+            dumpMemory()
+            faults++
         }
-        dumpStats(hits, faults)
     }
+
+    protected abstract fun replace(page: Int): Int?
+
 }

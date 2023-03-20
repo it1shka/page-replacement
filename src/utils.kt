@@ -1,4 +1,5 @@
-// ANSI colors
+import kotlin.math.max
+import kotlin.random.Random
 
 object Colors {
     const val RESET = "\u001B[0m"
@@ -12,46 +13,99 @@ object Colors {
     const val WHITE = "\u001B[37m"
 }
 
-// functions for console logging
-
-fun dumpStats(hits: Int, faults: Int) {
-    val hitsString = "Hits: $hits"
-    val faultsString = "Faults: $faults"
-    println("${Colors.YELLOW}$hitsString, $faultsString${Colors.RESET}")
+fun getPositiveInteger(prompt: String?): Int {
+    print(prompt ?: "Please, enter an integer: ")
+    while (true) {
+        val input = readln()
+        val value = input.toIntOrNull()
+        if (value == null) {
+            print("Not an integer. Please, try again: ")
+            continue
+        }
+        if (value <= 0) {
+            print("Integer should be bigger than zero. Please, try again: ")
+            continue
+        }
+        return value
+    }
 }
 
-fun dumpHeader(algorithm: String) {
-    println("${Colors.YELLOW}$algorithm${Colors.RESET}")
+private fun generateRandomReferenceString(size: Int): List<Int> {
+    var current = 0
+    return List(size + 1) {
+        current += when (Random.nextInt(3)) {
+            1 -> 1
+            2 -> -1
+            else -> 0
+        }
+        current = max(current, 1)
+        current
+    }
 }
 
-fun dumpHit(page: Int) {
-    println("Page $page was hit! ${Colors.GREEN}+1 hit${Colors.RESET}")
+private fun generateFullyRandomReferenceString(size: Int): List<Int> =
+    List(size) { Random.nextInt(10) }
+
+fun getPageReferenceString(): List<Int> {
+    println("Please, enter page reference string: ")
+    outer@ while (true) {
+        val input = readln().trim()
+        if (input.startsWith('~') || input.startsWith('@')) {
+            val size = input.slice(1 until input.length).toIntOrNull()
+            if (size == null) {
+                println("\"$input\" does not contain an integer. Please, try again: ")
+                continue@outer
+            }
+            val random = when(input[0]) {
+                '~' -> generateRandomReferenceString(size)
+                else -> generateFullyRandomReferenceString(size)
+            }
+            println("Reference string: ")
+            println("${Colors.GREEN}${random.joinToString()}${Colors.RESET}")
+            return random
+        }
+        val parts = input
+            .split(',')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        val output = mutableListOf<Int>()
+        for (part in parts) {
+            val page = part.toIntOrNull()
+            if (page == null) {
+                println("Page \"$part\" is not an integer. Please, try again: ")
+                continue@outer
+            }
+            if (page <= 0) {
+                println("Page \"$part\" is not a natural number. Please, try again: ")
+                continue@outer
+            }
+            output.add(page)
+        }
+        return output
+    }
 }
 
-fun dumpReplace(oldPage: Int?, newPage: Int) {
-    val message = if (oldPage == null) "Page $newPage was inserted"
-        else "Page $oldPage was replaced with Page $newPage"
-    println("$message. ${Colors.RED}+1 fault${Colors.RESET}")
+fun prompt(message: String?): Boolean {
+    while (true) {
+        print("${ message ?: "Select" } [Y/n] ")
+        when (readln().trim().lowercase()) {
+            "", "y", "yes", "true" -> return true
+            "n", "no", "false" -> return false
+        }
+    }
 }
 
-// memory dump
-
-private fun memLineFormat(strings: List<String>) =
-    strings.map { "* $it " }.reduce { a, b -> a + b } + "*"
-
-private fun memPageFormat(page: Int?) =
-    if (page == null) " "
-    else "${Colors.CYAN}$page${Colors.RESET}"
-
-fun dumpMemory(memory: Array<Int?>) {
-    val sizes = memory.map { it?.toString()?.length ?: 1 }
-    val totalNumberSize = sizes.sum()
-    val totalWidth = 4 + totalNumberSize + (memory.size - 1) * 3
-
-    val upperLine = "*".repeat(totalWidth)
-    val middleLine = memLineFormat(sizes.map { " ".repeat(it) })
-    val mainLine = memLineFormat(memory.map(::memPageFormat))
-
-    val lines = arrayOf (upperLine, middleLine, mainLine, middleLine, upperLine)
-    lines.forEach(::println)
+fun chooseFrom(message: String?, options: Array<String>): String {
+    println(message ?: "Please, choose one of the options: ")
+    options.forEachIndexed { index, option ->
+        println("${Colors.YELLOW}${index + 1})${Colors.RESET} $option")
+    }
+    while (true) {
+        val choice = getPositiveInteger("Provide the number: ") - 1
+        if (choice !in options.indices) {
+            println("$choice is not in options. ")
+            continue
+        }
+        return options[choice]
+    }
 }
