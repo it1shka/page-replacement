@@ -57,3 +57,30 @@ class LeastRecentlyUsed(memory: Memory): Algorithm(memory) {
         return best
     }
 }
+
+class RandomReplace(memory: Memory): Algorithm(memory) {
+    override val name = "Random (RAND)"
+
+    override fun replace(page: Int): Int? {
+        val random = memory.random()
+        memory.replace(random, page)
+        return random
+    }
+}
+
+class ApproxLeastRecentlyUsed(memory: Memory): Algorithm(memory) {
+    override val name = "Approx Least Recently Used (ALRU)"
+    private val counter = HashMap<Int?, Int>()
+
+    override fun processPage(page: Int) {
+        super.processPage(page)
+        counter.merge(page, 1, Int::plus)
+    }
+
+    override fun replace(page: Int): Int? {
+        val best = memory.minBy { counter[it] ?: 0 }
+        memory.replace(best, page)
+        counter[best] = 0
+        return best
+    }
+}

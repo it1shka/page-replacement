@@ -14,6 +14,7 @@ fun main() {
             "FIFO" -> FirstInFirstOut(memory)
             "OPT" -> Optimal(memory)
             "LRU" -> LeastRecentlyUsed(memory)
+            "RAND" -> RandomReplace(memory)
             else -> throw RuntimeException("This should never happen")
         }
         runAlgorithm(algorithm, memory, referenceString)
