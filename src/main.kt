@@ -6,7 +6,7 @@ fun main() {
 
     // here I will be running algorithms
     val briefResults = StringBuilder()
-    val choices = arrayOf("FIFO", "OPT", "LRU", "RAND", "ALRU", "Exit")
+    val choices = arrayOf("FIFO", "OPT", "LRU", "RAND", "ALRU", "LFU", "Exit")
 
     while (true) {
         val choice = chooseFrom("Choose an algorithm you wanna test: ", choices)
@@ -17,6 +17,7 @@ fun main() {
             "LRU" -> LeastRecentlyUsed(memory)
             "RAND" -> RandomReplace(memory)
             "ALRU" -> ApproxLeastRecentlyUsed(memory)
+            "LFU" -> LeastFrequentlyUsed(memory)
             else -> throw RuntimeException("This should never happen")
         }
         runAlgorithm(algorithm, memory, referenceString)

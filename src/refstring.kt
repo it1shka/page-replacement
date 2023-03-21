@@ -35,16 +35,44 @@ private fun cycled(size: Int, bound: Int): List<Int> {
     })
 }
 
-val modes = arrayOf("Full", "Drunkard Walk", "Cycled")
+private fun randDirection() =
+    if (Random.nextBoolean()) -1 else 1
+
+private fun locality(size: Int, bound: Int): List<Int> {
+    var current = bound / 2
+    return List(size) {
+        val prev = current
+        val choice = Random.nextInt(100)
+        current += when {
+            choice < 90  -> randDirection() // consecutive
+            choice == 99 -> max(4, bound / 3) * randDirection() // long jump
+            else         -> 0 // short jump
+        }
+        current = max(1, min(bound - 1, current))
+        prev
+    }
+}
+
+private fun symmetrical(original: List<Int>) =
+    List<Int>(original.size) {
+        if ((it <= original.size / 2) || Random.nextInt(100) >= 90)
+            original[it]
+        else original[original.lastIndex - it]
+    }
+
+val modes = arrayOf("Full", "Drunkard Walk", "Cycled", "Locality")
 private fun getRandomPageReferenceString(size: Int): List<Int> {
     val upperBound = getPositiveInteger("Upper bound of randomization (exclusive): ")
     val algorithm = when(chooseFrom("Choose randomization mode: ", modes)) {
         "Full" -> ::fullRandom
         "Drunkard Walk" -> ::drunkardWalk
         "Cycled" -> ::cycled
+        "Locality" -> ::locality
         else -> throw RuntimeException("This should never happen")
     }
-    return algorithm(size, upperBound)
+    val refString = algorithm(size, upperBound)
+    return if (prompt("Apply symmetry?")) symmetrical(refString)
+        else refString
 }
 
 fun getPageReferenceString(): List<Int> {

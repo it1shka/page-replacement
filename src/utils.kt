@@ -45,7 +45,7 @@ fun chooseFrom(message: String?, options: Array<String>): String {
     while (true) {
         val choice = getPositiveInteger("Provide the number: ") - 1
         if (choice !in options.indices) {
-            println("$choice is not in options. ")
+            println("${choice + 1} is not in options. ")
             continue
         }
         return options[choice]
