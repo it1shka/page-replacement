@@ -1,6 +1,3 @@
-import kotlin.math.max
-import kotlin.random.Random
-
 object Colors {
     const val RESET = "\u001B[0m"
     const val BLACK = "\u001B[30m"
@@ -27,61 +24,6 @@ fun getPositiveInteger(prompt: String?): Int {
             continue
         }
         return value
-    }
-}
-
-private fun generateRandomReferenceString(size: Int): List<Int> {
-    var current = 0
-    return List(size + 1) {
-        current += when (Random.nextInt(3)) {
-            1 -> 1
-            2 -> -1
-            else -> 0
-        }
-        current = max(current, 1)
-        current
-    }
-}
-
-private fun generateFullyRandomReferenceString(size: Int): List<Int> =
-    List(size) { Random.nextInt(10) }
-
-fun getPageReferenceString(): List<Int> {
-    println("Please, enter page reference string: ")
-    outer@ while (true) {
-        val input = readln().trim()
-        if (input.startsWith('~') || input.startsWith('@')) {
-            val size = input.slice(1 until input.length).toIntOrNull()
-            if (size == null) {
-                println("\"$input\" does not contain an integer. Please, try again: ")
-                continue@outer
-            }
-            val random = when(input[0]) {
-                '~' -> generateRandomReferenceString(size)
-                else -> generateFullyRandomReferenceString(size)
-            }
-            println("Reference string: ")
-            println("${Colors.GREEN}${random.joinToString()}${Colors.RESET}")
-            return random
-        }
-        val parts = input
-            .split(',')
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-        val output = mutableListOf<Int>()
-        for (part in parts) {
-            val page = part.toIntOrNull()
-            if (page == null) {
-                println("Page \"$part\" is not an integer. Please, try again: ")
-                continue@outer
-            }
-            if (page <= 0) {
-                println("Page \"$part\" is not a natural number. Please, try again: ")
-                continue@outer
-            }
-            output.add(page)
-        }
-        return output
     }
 }
 

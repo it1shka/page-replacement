@@ -2,10 +2,11 @@ fun main() {
     val slotsAmount = getPositiveInteger("Please, enter slots amount: ")
     val referenceString = getPageReferenceString()
     val memory = Memory(slotsAmount) { null }
+    println()
 
     // here I will be running algorithms
     val briefResults = StringBuilder()
-    val choices = arrayOf("FIFO", "OPT", "LRU", "Exit")
+    val choices = arrayOf("FIFO", "OPT", "LRU", "RAND", "ALRU", "Exit")
 
     while (true) {
         val choice = chooseFrom("Choose an algorithm you wanna test: ", choices)
@@ -15,6 +16,7 @@ fun main() {
             "OPT" -> Optimal(memory)
             "LRU" -> LeastRecentlyUsed(memory)
             "RAND" -> RandomReplace(memory)
+            "ALRU" -> ApproxLeastRecentlyUsed(memory)
             else -> throw RuntimeException("This should never happen")
         }
         runAlgorithm(algorithm, memory, referenceString)

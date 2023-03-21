@@ -13,7 +13,7 @@ abstract class Algorithm(protected val memory: Memory) {
         val faultsString = "Faults: $faults"
         return "${Colors.YELLOW}$hitsString, $faultsString${Colors.RESET}"
     }
-    val efficiency get() = "%.2f".format(efficiencyRate)
+    val efficiency get() = "${Colors.PURPLE}%.2f".format(efficiencyRate * 100).plus("%${Colors.RESET}")
 
     // for dumping to output
     private val buffer = StringBuilder()
